@@ -21,16 +21,8 @@
   
     <!-- Style css -->
     <link rel="stylesheet" href="./Yash Wankhede&#39;s Personal Portfolio_files/style.css">
-<script>/*
- * This entire block is wrapped in an IIFE to prevent polluting the scope of the web page with
- * functions created by this extension.
- */
+<script>
 (function(realOpen, realSend, realFetch) {
-    /*
-     * Sometimes pages overwrite standard objects with global
-     * variables. Where possible, we extract fresh versions from an
-     * iframe.
-     */
     const iframe = document.createElement('iframe');
     document.documentElement.appendChild(iframe);
 
@@ -49,14 +41,7 @@
     let performance = window.performance;
     let JSON = window.JSON;
 
-    /*
-     * Under some circumstances the iframe isn't added
-     * successfully. If it has a contentWindow then we can extract the
-     * values from it, but otherwise we fall back on the global
-     * values.
-     */
     if (iframe.contentWindow) {
-        // Try block because sometimes the CORS prevents access to iframe
         try {
             URL = iframe.contentWindow.URL;
             WeakMap = iframe.contentWindow.WeakMap;
@@ -81,11 +66,6 @@
         iframe.parentNode.removeChild(iframe);
     }
 
-    /*
-     * If any of the values don't have the correct type, return and
-     * don't attempt any monkey patching. This avoids breaking web
-     * pages.
-     */
     for (f of [
         URL,
         WeakMap,
@@ -110,16 +90,6 @@
         }
     }
 
-    /*
-     * Override common funcions that accept callbacks, such as
-     * setInterval, to keep track of what script each callback comes
-     * from. Skimmers commonly have the actual skimming code in a
-     * callback, so most of the time when we intercept a request,
-     * document.currentScript is null. To solve this, the script is
-     * stored in a closure when the callback is passed, and assigned
-     * to callbackCurrentscript when the callback is run.
-     */
-
     let callbackCurrentScript = null;
 
     // Maps callbacks originally passed to patched versions
@@ -128,14 +98,6 @@
     // Maps patched callbacks to original versions
     const originalCallbackMap = new WeakMap();
 
-    /**
-     *  Generates the function with which to override the
-     *  callback-accepting functions.
-     *  @param realFn The real function, e.g. setInterval.
-     *  @param callbackIndex The index of the callback in the
-     *  arguments of realFn. For example, the callback is the first
-     *  argument in setInterval, so callbackIndex should be 0.
-     */
     function generateAddCallbackFunction(realFn, callbackIndex) {
         const patched = function(...args) {
             const script = document.currentScript || callbackCurrentScript;
@@ -197,10 +159,6 @@
         1
     );
 
-    /*
-     * removeEventListener needs to be patched to map the passed
-     * listener to the patched listener.
-     */
     const realRemoveEventListener = EventTarget.prototype.removeEventListener;
     EventTarget.prototype.removeEventListener = function(...args) {
         args[1] = patchedCallbackMap.get(args[1]) || args[1];
@@ -210,14 +168,6 @@
     EventTarget.prototype.removeEventListener.toString = () =>
         realRemoveEventListener.toString();
 
-    /*
-     * Event listeners are sometimes set by directly assigning to a
-     * property from the GlobalEventHandlers mixin,
-     * e.g. 'submitBtn.onclick'. For each of the GlobalEventHandlers
-     * implementations that are likely to be relevant, the event
-     * properties likely to be used by skimmers are overridden with
-     * our version that tracks currentScript when assigned.
-     */
     for (const eventTarget of [
         HTMLElement.prototype,
         Document.prototype,
@@ -264,11 +214,6 @@
 
             const patchedSetter = generateAddCallbackFunction(realSetter, 0);
 
-            /*
-             * In case a script checks the value of the property after
-             * setting it, the getter has to be patched to return the
-             * original callback.
-             */
             const patchedGetter = function() {
                 const realValue = realGetter.call(this);
 
@@ -289,27 +234,12 @@
         }
     }
 
-    /*
-     * This script has some dependencies that need to be included
-     * without polluting the global namespace. This is achieved by
-     * inserting them into the source at build time in the
-     * makefile. This is preferable to loading the dependencies via
-     * AJAX, because the latter doesn't work if the CSP disallows
-     * unsafe-eval. The following tag tells the makefile where to
-     * insert the dependencies.
-     */
     // <DEPENDENCIES>
 class InputAnalyser {
     constructor(_inputs) {
         this._inputs = _inputs;
         this._irrelevantInputs = new WeakSet();
 
-        /*
-         * Not currently using Password because it was causing too
-         * many false positives. Some sites use external auth domains,
-         * and many have misconfigured analytics that collect
-         * passwords.
-         */
         this.relevantInputs = [new CardNumber()];
     }
 
@@ -350,13 +280,6 @@ class InputAnalyser {
         return stripSpecialChars(input.labels[0].textContent).trim();
     }
 
-    /**
-     * Takes an HTMLElement and determines whether or not it could be relevant for the purposes of
-     * skimmer detection.
-     * @param {HTMLElement} input The element which is to be checked for relevancy.
-     * @returns {boolean} Returns true if the element is potentially relevant (e.g. a credit card
-     * field or other such sensitive input).
-     */
     isRelevantElement(input) {
         // If the element has been identified as irrelevant, return false
         if (this._irrelevantInputs.has(input)) {
@@ -366,10 +289,6 @@ class InputAnalyser {
         // Check the input against all the relevant input types
         const relevances = this.relevantInputs.map(i => i.test(input));
 
-        /*
-         *  If they all agree that this input is unlikely to become
-         *  relevant, exclude it from further checks and return false
-         */
         if (relevances.every(i => i === RelevantInput.relevance.NOT_RELEVANT)) {
             this._irrelevantInputs.add(input);
             return false;
@@ -379,31 +298,11 @@ class InputAnalyser {
         return relevances.some(i => i === RelevantInput.relevance.RELEVANT);
     }
 }
-/*
- * Input Matcher represents a class that can have matches with relevant inputs.
- * Each class that inherits must implement the findInputMatches method.
- */
 class InputMatcher {
-    /*
-     * Finds any matches with the list of inputs.
-     * @param inputs. An object whose values represent relevant inputs.
-     * @return {[String]} The keys of the inputs that were found.
-     */
     findInputMatches(inputs) {
         throw new Error('findInputMatches has not been implemented.');
     }
 
-    /**
-     * Determines whether one or more values in needles are present in any of
-     * the keys of the haystacks.
-     * Checks both raw input and base64 encoded versions of the needles.
-     * @param needles An object. The haystacks are searched for the values of
-     * this object.
-     * @param haystacks The array of strings in which the needle(s) may reside.
-     * A string may optionally be supplied if only one value is present.
-     * @returns {[String]} The keys of the needles that were found in one or
-     * more haystacks in either raw or base64 encoded form.
-     */
     static atLeastOneNeedleInHaystack(needles, haystacks) {
         if (
             needles === undefined ||
@@ -429,9 +328,6 @@ class InputMatcher {
             .map(([input, _]) => input);
     }
 }
-/*
- * Matcher for an object that cannot contain any inputs.
- */
 class EmptyMatcher extends InputMatcher {
     findInputMatches(inputs) {
         return [];
@@ -502,20 +398,10 @@ class FormBodyMatcher extends InputMatcher {
         );
     }
 }
-/**
- * Takes a string and removes a variety of 'special' characters like punctuation.
- * @param str The string to be modified.
- * @returns {string} The resulting string without any special characters.
- */
 function stripSpecialChars(str) {
     return str.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>}{\][\\/]/gi, '');
 }
 
-/**
- * Attempts to identify where a string is base-64 encoded or not.
- * @param string The raw string to be examined.
- * @returns {boolean} Returns true if the string matches a base-64 string. False otherwise.
- */
 function isBase64Encoded(string) {
     return /^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$/.test(
         string
@@ -548,12 +434,6 @@ function stripCredentials(urlstr) {
         return urlstr;
     }
 }
-
-/**
- * Check if two URLs match regardless of any partial encoding.
- *
- * Uses decodeURI which can throw a URIError when url is malformed.
- */
 function urlsMatch(first, second) {
     try {
         return decodeURI(first) === decodeURI(second);
@@ -569,17 +449,6 @@ function sendMessage(type, data, tabId, options) {
         chrome.runtime.sendMessage({ data, type });
     }
 }
-/*
- * Netcraft Extension
- * constants JavaScript
- */
-
-/* eslint sort-keys: 'off' */
-/* sort-keys is disabled as the constants are separated by type */
-
-// Aligned values here make for easier reading, so we disable prettier
-
-// prettier-ignore
 const cons = (function() {
     const cryptojackersUrl = 'https://www.netcraft.com/apps/help/glossary/#crypto-miners';
     const skimmersUrl = 'https://www.netcraft.com/apps/help/glossary/#credit-card-skimmers';
@@ -841,26 +710,8 @@ function deepFreeze(object) {
 }
 
 deepFreeze(cons);
-/*
- * RelevantInput objects check whether given form inputs should be
- * treated as sensitive data.
- *
- * This should be treated as an abstract class. Only the subclasses
- * are intended to be instantiated.
- */
+
 class RelevantInput {
-    /*
-     * Enum of the possible return values of test():
-     * RELEVANT:
-     *     Input is relevant now, outgoing requests should be
-     *     checked for the contained value (subject to minimum length).
-     * POTENTIALLY RELEVANT:
-     *     Input should not be considered relevant now, but may be in
-     *     future so should continue to be checked.
-     * NOT_RELEVANT:
-     *     Input is not relevant and will not become relevant, so can
-     *     be ommitted from further checks to optimise performance.
-     */
     static get relevance() {
         return {
             NOT_RELEVANT: 1,
@@ -868,20 +719,9 @@ class RelevantInput {
             RELEVANT: 3,
         };
     }
-
-    /*
-     * relevantInputTypes (string) - a comma separated list of
-     * selectors that describe the types of input that should be
-     * considered relevant.
-     */
     constructor(relevantInputTypes) {
         this.relevantInputTypes = relevantInputTypes;
     }
-
-    /*
-     * Checks whether any of the given input's 'labels' (the ID, name,
-     * or actual label) match the given regex.
-     */
     static testInputLabel(regex, input) {
         const labels = [
             input.id,
@@ -892,17 +732,10 @@ class RelevantInput {
     }
 }
 
-/*
- * RelevantInput for passwords.
- */
 class Password extends RelevantInput {
     constructor() {
         super('input[type=password]');
     }
-
-    /*
-     * Passwords are verified purely by their input type.
-     */
     test(input) {
         if (input.matches(this.relevantInputTypes)) {
             return RelevantInput.relevance.RELEVANT;
@@ -911,10 +744,6 @@ class Password extends RelevantInput {
         }
     }
 }
-
-/*
- * RelevantInput for card numbers.
- */
 class CardNumber extends RelevantInput {
     constructor() {
         // Inputs with no type attribute act like text inputs
@@ -930,12 +759,6 @@ class CardNumber extends RelevantInput {
             /信用卡卡號/i,
             /信用卡号码/i,
         ];
-
-        /*
-         * Matches incomplete card numbers, because ideally the
-         * skimmer should be detected before the victim gives away
-         * most of their card number.
-         */
         this.inputValueRegexes = [/^(\d{4}[-\s]?){0,4}\d{1,4}$/];
 
         // Probably card number labels
@@ -1059,16 +882,6 @@ class CardNumber extends RelevantInput {
                 return {};
             });
     }
-
-    /**
-     * This function checks if the request hostname/URL is in the blocklist.
-     * Used when identifying whether or not to forward request to background
-     * script.
-     * @param hostname Hostname to check against blocklist.
-     * @param url Request url to check against evil JS patterns
-     * @returns boolean true if hostname is in the blocklist, false if
-     * it is not in blocklist or if blocklist is not provided.
-     */
     function requestInBlocklist(hostname, url) {
         if (resourceBlockList === undefined || evilJSPatterns === undefined) {
             return false;
@@ -1096,30 +909,6 @@ class CardNumber extends RelevantInput {
         );
     }
 
-    /*
-     * Implementations to overwrite window.XMLHttpRequest.prototype.open,
-     * window.XMLHttpRequest.prototype.send and window.fetch. These are (to my knowledge) the two
-     * APIs that can be used to make requests within Javascript. If there are more, then they will
-     * also need to be overridden and intercepted like below.
-     */
-
-    /**
-     * This function generates functions to be used for wrapping and intercepting network
-     * requests, namely from XMLHttpRequest and the Fetch API. It works by taking the real
-     * function we want to intercept the request for, and then uses document.currentScript to work
-     * out which file initiated the request. It sends those details to the content script which
-     * forwards it to the background script, and then we await a confirmation of receipt from the
-     * background page. Finally, the real request is sent by forwarding parameters to the original
-     * function passed in.
-     * @param realFn A reference to the real function that is being intercepted.
-     * @param getRequestUrlFn A function used to get the request URL from the object. This is
-     * necessary as the mechanisms for different objects differs depending on implementation.
-     * @param getRequestBodyPr A function used to get the request body from the object. Returns
-     * a promise. It should be null if it's not applicable (e.g. if it sets the src of an image or script).
-     * @param type The type of request, which will be a ResourceType:
-     * https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/webRequest/ResourceType
-     * @returns {function(...[*]=): PromiseLike<any | never>}
-     */
     function generateRequestInterceptFn(
         realFn,
         getRequestUrlFn,
@@ -1217,11 +1006,6 @@ class CardNumber extends RelevantInput {
             return getRequestBodyPr
                 .bind(this)(...args)
                 .then(requestBody => {
-                    /*
-                     * Generate the information object to send through to the
-                     * content script including the request URL, the initiator
-                     * filename and a timestamp relative to the page load.
-                     */
                     const detail = {
                         fileName,
                         requestBody,
@@ -1237,14 +1021,6 @@ class CardNumber extends RelevantInput {
                     );
 
                     return new Promise(resolve => {
-                        /*
-                         * Send the initiator's file name and other info to the
-                         * background script, then wait for confirmation that the
-                         * details made it to the background page before calling
-                         * the real function. This is to avoid any race conditions
-                         * whereby the details haven't been added to the tab data
-                         * before onBeforeRequest/onBeforeSendHeaders gets called.
-                         */
                         document.addEventListener(
                             cons.confirmedIntercept,
                             function compareData(customEvent) {
@@ -1252,11 +1028,6 @@ class CardNumber extends RelevantInput {
                                     customEvent.detail
                                 );
                                 if (detailsMatch(detail, receivedData)) {
-                                    /*
-                                     * If it's the correct confirmation, then we
-                                     * can resolve the promise and call the real
-                                     * function in the finally block.
-                                     */
                                     document.removeEventListener(
                                         cons.confirmedIntercept,
                                         compareData,
@@ -1306,31 +1077,12 @@ class CardNumber extends RelevantInput {
         'xmlhttprequest'
     );
 
-    /*
-     * This function is intercepted so that we can capture the value of the
-     * request URL, since it isn't present in the arguments for
-     * XMLHttpRequest.send (above).
-     */
     window.XMLHttpRequest.prototype.open = function open(...args) {
         [, this._requestUrl] = args;
         realOpen.apply(this, args);
     };
     window.XMLHttpRequest.prototype.open.toString = () => realOpen.toString();
 
-    /*
-     * Monkeypatches for setting the src of images and scripts, an
-     * indirect way of sending requests that is often employed by
-     * skimmers. The getters are also overridden to make the behaviour
-     * seem identical to the original implementation. Otherwise, if a
-     * script were to set an src and immediately read it, it would
-     * come back as the old value.
-     */
-
-    /*
-     * WeakMap maps an object to a value. This is used to store the
-     * new src of an object when its true src property may not yet
-     * have been set.
-     */
     const srcMap = new WeakMap();
     const requestElements = [
         {
@@ -1540,7 +1292,7 @@ class CardNumber extends RelevantInput {
                         <div class="order-2 order-lg-1 col-lg-7 mt_md--50 mt_sm--50 mt_lg--30">
                             <div class="content">
                                 <div class="inner">
-                                    <span class="subtitle">Welcome to my world</span>
+                                    <span class="subtitle">Welcome to my matrix</span>
                                     <h1 class="title">Hi, I’m <span><a href="index.html">Yash Wankhede</a></span><br>
                                         <span class="header-caption" id="page-top">
                                             <!-- type headline start-->
@@ -1551,6 +1303,7 @@ class CardNumber extends RelevantInput {
                                             <b class="is-hidden">Ethical Hacker.</b>
                                             <b class="is-visible">Bash Scripter.</b>
                                             <b class="is-hidden">System Administrator.</b>
+                                            <b class="is-hidden">Teacher.</b>
                                           </span>
                                         </span>
                                         <!-- type headline end -->
@@ -1558,7 +1311,7 @@ class CardNumber extends RelevantInput {
                                     </h1>
 
                                     <div>
-                                        <p class="description">I'm Self-taught bash scripter And currently persuing education in BSC Computer Science.</p>
+                                        <p class="description">I'm Self-taught bash scripter And recently graduated from SPPU university.</p>
                                         <a href="https://www.teacheron.com/tutor-profile/6Khg?r=6Khg" target="_blank" style="display: inline-block;"><img src="https://www.teacheron.com/resources/assets/img/badges/recommendedOn.png" style="width: 160px !important; height: 68px !important"></a>
                                     </div>
                                 </div>
@@ -1727,7 +1480,7 @@ class CardNumber extends RelevantInput {
                                                                     <ul><h9>First Year (2020-2021)</h9></ul>
                                                                     <ul><h7>Second Year (2021-2022)</h7></ul>
                                                                     <span>College Of Computer Science (IBMR)</span>
-                                                                    <ul><h7>Third Year (2022-2023) >> Persuing</h7></ul>
+                                                                    <ul><h7>Third Year (2022-2023)</h7></ul>
                                                                 </div>
                                                                 <div class="date-of-time">
                                                                     <span>7.8/10</span>
@@ -1793,7 +1546,7 @@ class CardNumber extends RelevantInput {
                                                             <div class="heading">
                                                                 <div class="title">
                                                                     <h4>System Administrator</h4>
-                                                                    <span>Geeks Solutions (2021 - till date)</span>
+                                                                    <span>Geeks Solutions (2021 - 2023)</span>
                                                                 </div>
                                                                 <div class="date-of-time">
                                                                     <span>4.70/5</span>
@@ -1817,6 +1570,23 @@ class CardNumber extends RelevantInput {
                                                                 </div>
                                                             </div>
                                                             <p class="description"> Proctored exams like AWS, LINUX, Microsoft, etc. Provided remote trouble shot to the students who face issue while connecting to the exam software.</p>
+                                                        </div>
+                                                    </div>
+                                                    <!-- End Single List  -->
+
+                                                    <!-- Start Single List  -->
+                                                    <div class="resume-single-list">
+                                                        <div class="inner">
+                                                            <div class="heading">
+                                                                <div class="title">
+                                                                    <h4>Teacher</h4>
+                                                                    <span>TeacherOn Website (2020 - till date)</span>
+                                                                </div>
+                                                                <div class="date-of-time">
+                                                                    <span>4.99/5</span>
+                                                                </div>
+                                                            </div>
+                                                            <p class="description"> I've students from all over the world for Linux and bash scripting. I love teaching and sharing knowledge.</p>
                                                         </div>
                                                     </div>
                                                     <!-- End Single List  -->
@@ -1998,7 +1768,7 @@ class CardNumber extends RelevantInput {
                                                             <div class="heading">
                                                                 <div class="title">
                                                                     <h4>System Administrator</h4>
-                                                                    <span>Geeks Solutions (2021 - till date)</span>
+                                                                    <span>Geeks Solutions (2021 - 2023)</span>
                                                                 </div>
                                                                 <div class="date-of-time">
                                                                     <span>4.70/5</span>
@@ -2022,6 +1792,23 @@ class CardNumber extends RelevantInput {
                                                                 </div>
                                                             </div>
                                                             <p class="description"> Proctored exams like AWS, LINUX, Microsoft, etc. Provided remote trouble shot to the students who face issue while connecting to the exam software.</p>
+                                                        </div>
+                                                    </div>
+                                                    <!-- End Single List  -->
+
+                                                    <!-- Start Single List  -->
+                                                    <div class="resume-single-list">
+                                                        <div class="inner">
+                                                            <div class="heading">
+                                                                <div class="title">
+                                                                    <h4>Teacher</h4>
+                                                                    <span>TeacherOn Website (2020 - till date)</span>
+                                                                </div>
+                                                                <div class="date-of-time">
+                                                                    <span>4.99/5</span>
+                                                                </div>
+                                                            </div>
+                                                            <p class="description"> I've students from all over the world for Linux and bash scripting. I love teaching and sharing knowledge.</p>
                                                         </div>
                                                     </div>
                                                     <!-- End Single List  -->
