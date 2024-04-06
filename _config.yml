@@ -1,0 +1,6 @@
+# _config.yml
+
+# Define MIME types for font files
+mime_types:
+  woff: "application/font-woff"
+  woff2: "font/woff2"
