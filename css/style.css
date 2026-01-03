@@ -100,3 +100,24 @@ nav ul li {
     color: var(--text-color);
   }
 }
+
+.profile-button {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: transparent;
+  border: 2px solid var(--text-color);
+  color: var(--text-color);
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 400;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-family: 'Roboto Mono', sans-serif;
+}
+
+.profile-button:hover {
+  background-color: var(--text-color);
+  color: #333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 170, 0, 0.3);
+}
