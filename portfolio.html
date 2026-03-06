@@ -1069,6 +1069,46 @@
                 width: auto;
                 vertical-align: middle;
             }
+            /* Skills section - consistent icon size and alignment */
+            #skills .skill-share-inner {
+                padding: 24px 20px;
+                text-align: center;
+            }
+            #skills .skill-share-inner .title {
+                display: block;
+                margin-bottom: 20px;
+                font-size: 18px;
+                font-weight: 600;
+            }
+            #skills .skill-share {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                align-items: center;
+                gap: 20px;
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+            #skills .skill-share li {
+                flex: 0 0 auto;
+            }
+            #skills .skill-share li img {
+                width: 56px;
+                height: 56px;
+                object-fit: contain;
+                display: block;
+            }
+            #skills .row.row--25 > [class*="col-"] {
+                display: flex;
+                align-items: stretch;
+            }
+            #skills .row.row--25 .skill-share-inner {
+                width: 100%;
+                background: var(--background-color-1, #1e1e1e);
+                border-radius: 12px;
+                box-shadow: var(--shadow-1);
+            }
         </style>
     </head>
 
