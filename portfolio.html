@@ -17,8 +17,7 @@
         <link rel="stylesheet" href="./assets/slick.css">
         <link rel="stylesheet" href="./assets/slick-theme.css">
         <link rel="stylesheet" href="./assets/aos.css">
-        <link
-        rel="stylesheet" href="./assets/feature.css">
+        <link rel="stylesheet" href="./assets/feature.css">
 
         <!-- Style css -->
         <link rel="stylesheet" href="./assets/style.css">
@@ -1065,6 +1064,11 @@
             .rn-service--featured:hover {
                 box-shadow: 0 0 28px rgba(246, 55, 236, 0.35);
             }
+            .header-left .header-logo-img {
+                height: 40px;
+                width: auto;
+                vertical-align: middle;
+            }
         </style>
     </head>
 
@@ -1079,8 +1083,8 @@
                 <div class="col-lg-2 col-6">
                     <div class="header-left">
                         <div class="logo">
-                            <a href="#">
-                                <img src="./assets/avatar.png" alt="logo">
+                            <a href="#home">
+                                <img src="./assets/fav_icon.png" alt="Yash Wankhede" class="header-logo-img">
                                 Yash
                             </a>
                         </div>
@@ -1102,6 +1106,9 @@
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link smoth-animation" href="#projects">Projects</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link smoth-animation" href="#skills">Skills</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link smoth-animation" href="#resume">Resume</a>
@@ -1157,8 +1164,8 @@
             <div class="inner">
                 <div class="menu-top">
                     <div class="menu-header">
-                        <a class="logo" href="https://yashwankhede.github.io/My-Website/">
-                            <img src="./assets/avatar.png" alt="Personal Portfolio">
+                        <a class="logo" href="#home">
+                            <img src="./assets/fav_icon.png" alt="Personal Portfolio">
                         </a>
                         <div class="close-button">
                             <button class="close-menu-activation close">
@@ -1181,6 +1188,9 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link smoth-animation" href="#projects">Projects</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link smoth-animation" href="#skills">Skills</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link smoth-animation" href="#resume">Resume</a>
@@ -1333,6 +1343,43 @@
                 </div>
             </div>
             <!-- End Slider Area -->
+
+            <!-- Start Skills Area -->
+            <div class="rn-service-area rn-section-gap section-separator" id="skills">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="section-title text-left aos-init aos-animate" data-aos="fade-up" data-aos-duration="500" data-aos-delay="100" data-aos-once="true">
+                                <span class="subtitle">Technical Skills</span>
+                                <h2 class="title">Scripting &amp; Tools</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row row--25 mt_md--10 mt_sm--10">
+                        <div class="col-lg-6 col-xl-6 col-md-6 col-sm-6 col-12 mt_mobile--30">
+                            <div class="skill-share-inner">
+                                <span class="title">Scripting</span>
+                                <ul class="skill-share d-flex liststyle">
+                                    <li><img src="./assets/bash.png" alt="Bash"></li>
+                                    <li><img src="./assets/python.png" alt="Python"></li>
+                                    <li><img src="./assets/icons-08.png" alt="Linux"></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-xl-6 col-md-6 col-sm-6 col-12 mt_mobile--30">
+                            <div class="skill-share-inner">
+                                <span class="title">Penetration Testing</span>
+                                <ul class="skill-share d-flex liststyle">
+                                    <li><img src="./assets/kali.png" alt="Kali Linux"></li>
+                                    <li><img src="./assets/icons-08.png" alt="Metasploit"></li>
+                                    <li><img src="./assets/bash.png" alt="Tools"></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End Skills Area -->
 
             <!-- Start Service Area -->
             <div class="rn-service-area rn-section-gap section-separator" id="features">
@@ -1657,6 +1704,31 @@
                                         </div>
                                     </div>
                                     <a class="over-link" href="#"></a>
+                                </div>
+                            </div>
+                            <!-- End Single Project -->
+
+                            <!-- Start Single Project -->
+                            <div data-aos="fade-up" data-aos-duration="500" data-aos-delay="450" data-aos-once="true" class="col-lg-6 col-xl-4 col-md-6 col-sm-12 col-12 mt--50 mt_md--30 mt_sm--30 aos-init aos-animate">
+                                <div class="rn-service">
+                                    <div class="inner">
+                                        <div class="icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-terminal">
+                                                <polyline points="4 17 10 11 4 5"></polyline>
+                                                <line x1="12" y1="19" x2="20" y2="19"></line>
+                                            </svg>
+                                        </div>
+                                        <div class="content">
+                                            <h4 class="title">
+                                                <a href="https://github.com/yashwankhede/Terminal_AI" target="_blank">Terminal_AI</a>
+                                            </h4>
+                                            <p class="description">AI-powered terminal assistant that executes shell tasks from natural language. Built with OpenAI GPT for smarter terminal automation.</p>
+                                            <a class="read-more-button" href="https://github.com/yashwankhede/Terminal_AI" target="_blank">
+                                                <i class="feather-arrow-right"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <a class="over-link" href="https://github.com/yashwankhede/Terminal_AI" target="_blank"></a>
                                 </div>
                             </div>
                             <!-- End Single Project -->
@@ -2434,8 +2506,8 @@
                         <div class="footer-area text-center">
 
                             <div class="logo">
-                                <a href="#">
-                                    <img src="./assets/avatar.png" alt="logo">
+                                <a href="#home">
+                                    <img src="./assets/fav_icon.png" alt="logo">
                                 </a>
                             </div>
 

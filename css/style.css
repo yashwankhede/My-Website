@@ -20,6 +20,23 @@ body {
   line-height: 1.6;
 }
 
+.site-logo {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  display: block;
+}
+.site-logo img {
+  width: 48px;
+  height: 48px;
+  display: block;
+  transition: opacity 0.2s ease;
+}
+.site-logo:hover img {
+  opacity: 0.85;
+}
+
 h1 {
   color: var(--text-color);
   font-size: 50px;
